@@ -1,11 +1,7 @@
 # =========================================================
 # Clean and merge county personal income data
-# Project: us-income-wellbeing-analysis-410
 # =========================================================
 
-# -------------------------
-# 1. Load packages
-# -------------------------
 library(readr)
 library(dplyr)
 library(tidyr)
@@ -117,3 +113,13 @@ if (nrow(missing_income_fips) > 0) {
 write_csv(final_panel_income, output_file)
 
 cat("Final file saved to:\n", output_file, "\n")
+
+
+
+
+
+
+
+
+
+

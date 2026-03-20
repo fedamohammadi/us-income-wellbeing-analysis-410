@@ -147,3 +147,16 @@ if (nrow(missing_labor_matches) > 0) {
 write_csv(final_panel_labor, output_file)
 
 cat("Final file saved to:\n", output_file, "\n")
+
+
+# to view the data
+
+View(final_panel_labor)
+summary(final_panel_labor$unemployment_rate)
+table(final_panel_labor$year)
+
+
+
+
+
+
