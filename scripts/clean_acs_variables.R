@@ -13,7 +13,7 @@ library(tidyr)
 # -------------------------
 # 1. Census API key
 # -------------------------
-census_api_key("cba4ed8c9d5373570249278ef7d675e238213035", 
+census_api_key("my API key", 
                install = FALSE, 
                overwrite = TRUE)
 
