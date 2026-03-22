@@ -289,6 +289,90 @@ saveRDS(model2, "model2_life_expectancy.rds")
 saveRDS(model3, "model3_wellbeing_index.rds")
 
 
+# ====================================================
+# Robustness check : Heteroskedasticity
+# ====================================================
+
+install.packages("lmtest")
+library(lmtest)
+
+# Test model 1
+
+ols1 <- lm(
+  poor_mental_health_days ~ log_income * Appalachian +
+    unemployment_rate + poverty_rate + bachelors_share +
+    uninsured_rate + population_density + gini,
+  data = model1_df
+)
+
+bptest(ols1)
+
+
+# Test model 2
+
+ols2 <- lm(
+  life_expectancy ~ log_income * Appalachian +
+    unemployment_rate + poverty_rate + bachelors_share +
+    uninsured_rate + population_density + gini,
+  data = model2_df
+)
+
+bptest(ols2)
+
+
+# Test model 3
+
+ols3 <- lm(
+  wellbeing_index ~ log_income * Appalachian +
+    unemployment_rate + poverty_rate + bachelors_share +
+    uninsured_rate + population_density + gini,
+  data = model3_df
+)
+
+bptest(ols3)
+
+
+
+# fixing for Heteroskedasticity
+
+model1_plain <- feols(
+  fml1,
+  data = model1_df
+)
+
+
+model1_robust <- feols(
+  fml1,
+  data = model1_df,
+  vcov = "hetero"
+)
+
+
+
+model1_cluster <- model1
+
+
+
+
+etable(
+  model1_plain,
+  model1_robust,
+  model1_cluster,
+  headers = c("Plain", "Robust", "Clustered")
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
