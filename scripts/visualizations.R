@@ -313,6 +313,89 @@ ggsave(
 
 
 
+
+# ---------------------------------------------------------
+# FIGURE: Marginal effect of income on well-being by region
+# Model 3
+# ---------------------------------------------------------
+
+# Coefficients
+b <- coef(model3)
+V <- vcov(model3)
+
+# Effect in Non-Appalachia
+beta_nonapp <- b["log_income"]
+
+# Effect in Appalachia
+beta_app <- b["log_income"] + b["log_income:Appalachian"]
+
+# Standard error for Non-Appalachia
+se_nonapp <- sqrt(V["log_income", "log_income"])
+
+# Standard error for Appalachia
+se_app <- sqrt(
+  V["log_income", "log_income"] +
+    V["log_income:Appalachian", "log_income:Appalachian"] +
+    2 * V["log_income", "log_income:Appalachian"]
+)
+
+# 95% confidence intervals
+ci_nonapp_low  <- beta_nonapp - 1.96 * se_nonapp
+ci_nonapp_high <- beta_nonapp + 1.96 * se_nonapp
+
+ci_app_low  <- beta_app - 1.96 * se_app
+ci_app_high <- beta_app + 1.96 * se_app
+
+# Data frame for plotting
+effect_df <- data.frame(
+  Region = factor(
+    c("Appalachia", "Non-Appalachia"),
+    levels = c("Appalachia", "Non-Appalachia")
+  ),
+  Effect = c(beta_app, beta_nonapp),
+  CI_low = c(ci_app_low, ci_nonapp_low),
+  CI_high = c(ci_app_high, ci_nonapp_high)
+)
+
+# Plot
+p_effect_bar <- ggplot(effect_df, aes(x = Region, y = Effect, fill = Region)) +
+  geom_col(width = 0.6, alpha = 0.9) +
+  geom_errorbar(aes(ymin = CI_low, ymax = CI_high), width = 0.14, linewidth = 0.8) +
+  geom_text(aes(label = sprintf("%.3f", Effect)), vjust = -0.55, size = 5, fontface = "bold") +
+  scale_fill_manual(values = c("Appalachia" = "steelblue",
+                               "Non-Appalachia" = "firebrick")) +
+  labs(
+    title = "The Effect of Income on Well-Being in Appalachia vs Non-Appalchia",
+    x = "",
+    y = "Estimated Effect of Income on Well-Being",
+    caption = "Bars show Model 3 marginal effects of log income on the well-being index (and it's clearly stronger in Appalachia).\nError bars represent 95% confidence intervals."
+  ) +
+  coord_cartesian(ylim = c(min(effect_df$CI_low) - 0.03, max(effect_df$CI_high) + 0.05)) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.title = element_text(face = "bold"),
+    plot.caption = element_text(size = 10, color = "gray30", hjust = 0),
+    plot.caption.position = "plot"
+  )
+
+print(p_effect_bar)
+
+ggsave(
+  "Output/figures/income_effect_wellbeing_by_region.png",
+  p_effect_bar,
+  width = 8,
+  height = 5.5,
+  dpi = 300,
+  bg = "white"
+)
+
+
+
+
+
 # ---------------------------------------------------------
 # FIGURE 4: Coefficient Plot 
 # ---------------------------------------------------------
@@ -454,8 +537,8 @@ slope_nonapp <- lm(wellbeing_index ~ log_income,
 # We place the text in the top-left corner of each facet (adjust x and y as needed)
 label_df <- data.frame(
   Appalachia_Label = c("Appalachian", "Non-Appalachian"),
-  x = c(min(df$log_income, na.rm = TRUE)), # Position at the start of the X axis
-  y = c(max(df$wellbeing_index, na.rm = TRUE)), # Position at the top of the Y axis
+  x = c(min(df$log_income, na.rm = TRUE), min(df$log_income, na.rm = TRUE)),
+  y = c(max(df$wellbeing_index, na.rm = TRUE), max(df$wellbeing_index, na.rm = TRUE)),
   label = c(
     paste0("Slope = ", round(slope_app, 3)),
     paste0("Slope = ", round(slope_nonapp, 3))
@@ -496,13 +579,12 @@ print(p_scatter_final)
 
 
 
-
 # Save
 ggsave(
-  filename = "Output/figures/scatter_income_wellbeing_facet.png",
-  plot = p_scatter_facet,
+  filename = "Output/figures/scatter_income_wellbeing_slopes.png",
+  plot = p_scatter_final,
   width = 10,
-  height = 5,
+  height = 6,
   dpi = 300,
   bg = "white"
 )
