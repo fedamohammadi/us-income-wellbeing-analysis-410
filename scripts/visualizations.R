@@ -442,6 +442,61 @@ print(p_scatter_facet)
 
 
 
+# 1. Calculate the slopes dynamically for each group
+# We use a simple linear model for each subset of the data
+slope_app <- lm(wellbeing_index ~ log_income, 
+                data = df %>% filter(Appalachia_Label == "Appalachian"))$coefficients["log_income"]
+
+slope_nonapp <- lm(wellbeing_index ~ log_income, 
+                   data = df %>% filter(Appalachia_Label == "Non-Appalachian"))$coefficients["log_income"]
+
+# 2. Create the label data frame
+# We place the text in the top-left corner of each facet (adjust x and y as needed)
+label_df <- data.frame(
+  Appalachia_Label = c("Appalachian", "Non-Appalachian"),
+  x = c(min(df$log_income, na.rm = TRUE)), # Position at the start of the X axis
+  y = c(max(df$wellbeing_index, na.rm = TRUE)), # Position at the top of the Y axis
+  label = c(
+    paste0("Slope = ", round(slope_app, 3)),
+    paste0("Slope = ", round(slope_nonapp, 3))
+  )
+)
+
+# 3. Create the finalized plot
+p_scatter_final <- ggplot(df, aes(x = log_income, y = wellbeing_index, color = Appalachia_Label)) +
+  geom_point(alpha = 0.05) +
+  geom_smooth(method = "lm", linewidth = 1, se = TRUE) +
+  # Adding the slopes
+  geom_text(
+    data = label_df,
+    aes(x = x, y = y, label = label),
+    color = "black",       
+    hjust = -0.1,          
+    vjust = 1.5,           # Shift slightly down from the top
+    size = 4.5,            
+    fontface = "bold",     # Make it pop
+    inherit.aes = FALSE    
+  ) +
+  scale_color_manual(values = c("steelblue", "firebrick")) +
+  facet_wrap(~Appalachia_Label) +
+  labs(
+    title = "Income and Well-Being by Region",
+    x = "Log Income",
+    y = "Well-Being Index",
+    color = "Region"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    strip.text = element_text(face = "bold", size = 14), 
+    legend.position = "none"
+  )
+
+print(p_scatter_final)
+
+
+
+
 # Save
 ggsave(
   filename = "Output/figures/scatter_income_wellbeing_facet.png",
@@ -451,6 +506,7 @@ ggsave(
   dpi = 300,
   bg = "white"
 )
+
 
 
 # ==================================================
