@@ -523,6 +523,39 @@ ggsave("Output/figures/trend_physical_health.png", p_trend_physical,
 
 
 
+# Poverty rates vs well-being ==============================
+
+p_poverty_facet <- ggplot(df, aes(x = poverty_rate, y = wellbeing_index, color = Appalachia_Label)) +
+  geom_point(alpha = 0.03) +
+  geom_smooth(method = "lm", linewidth = 1) +
+  scale_color_manual(values = c("steelblue", "firebrick")) +
+  facet_wrap(~Appalachia_Label) +
+  labs(
+    title = "Poverty and Well-Being by Region",
+    x = "Poverty Rate",
+    y = "Well-Being Index"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p_poverty_facet)
+
+
+# Save
+ggsave("Output/figures/poverty_wellbeing_facet.png",
+       width = 10, height = 5, dpi = 300, bg = "white")
+
+
+
+
+
+
+
+
+
 
 
 
