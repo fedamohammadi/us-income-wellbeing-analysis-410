@@ -453,6 +453,77 @@ ggsave(
 )
 
 
+# ==================================================
+# average poor mental health days over time
+# average poor physical health days over time
+# ==================================================
+
+trend_df <- df %>%
+  group_by(year, Appalachia_Label) %>%
+  summarize(
+    mental_health = mean(poor_mental_health_days, na.rm = TRUE),
+    physical_health = mean(poor_physical_health_days, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# mental health over time
+
+p_trend_mental <- ggplot(trend_df, aes(x = year, y = mental_health, color = Appalachia_Label)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("steelblue", "firebrick")) +
+  scale_x_continuous(
+    breaks = 2011:2023   # force all years
+  ) +
+  labs(
+    title = "Poor Mental Health Days Over Time",
+    x = "Year",
+    y = "Average Poor Mental Health Days",
+    color = "Region"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p_trend_mental)
+
+
+
+# Physical health over time
+
+p_trend_physical <- ggplot(trend_df, aes(x = year, y = physical_health, color = Appalachia_Label)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("steelblue", "firebrick")) +
+  scale_x_continuous(
+    breaks = 2011:2023   # show all years
+  ) +
+  labs(
+    title = "Poor Physical Health Days Over Time",
+    x = "Year",
+    y = "Average Poor Physical Health Days",
+    color = "Region"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p_trend_physical)
+
+
+
+ggsave("Output/figures/trend_mental_health.png", p_trend_mental,
+       width = 7, height = 5, dpi = 300, bg = "white")
+
+ggsave("Output/figures/trend_physical_health.png", p_trend_physical,
+       width = 7, height = 5, dpi = 300, bg = "white")
+
+
+
+
+
 
 
 
