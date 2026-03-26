@@ -807,3 +807,90 @@ ggsave(
 
 
 
+# ==================================================
+# WELL-BEING INDEX OVER TIME
+# Appalachian vs Non-Appalachian
+# ==================================================
+
+wb_trend_df <- df %>%
+  group_by(year, Appalachia_Label) %>%
+  summarize(
+    mean_wb = mean(wellbeing_index, na.rm = TRUE),
+    median_wb = median(wellbeing_index, na.rm = TRUE),
+    sd_wb = sd(wellbeing_index, na.rm = TRUE),
+    n = sum(!is.na(wellbeing_index)),
+    se_wb = sd_wb / sqrt(n),
+    .groups = "drop"
+  )
+
+
+p_wb_trend <- ggplot(
+  wb_trend_df,
+  aes(x = year, y = mean_wb, color = Appalachia_Label, group = Appalachia_Label)
+) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("steelblue", "firebrick")) +
+  scale_x_continuous(breaks = 2011:2023) +
+  labs(
+    title = "Well-Being Index Over Time by Region",
+    subtitle = "Average county-level well-being index, 2011–2023",
+    x = "Year",
+    y = "Well-Being Index",
+    color = "Region"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p_wb_trend)
+
+ggsave(
+  "Output/figures/wellbeing_trend_by_region.png",
+  p_wb_trend,
+  width = 8,
+  height = 5,
+  dpi = 300,
+  bg = "white"
+)
+
+
+wb_gap_df <- wb_trend_df %>%
+  select(year, Appalachia_Label, mean_wb) %>%
+  pivot_wider(names_from = Appalachia_Label, values_from = mean_wb) %>%
+  mutate(gap = `Non-Appalachian` - Appalachian)
+
+p_wb_gap <- ggplot(wb_gap_df, aes(x = year, y = gap)) +
+  geom_line(linewidth = 1.2, color = "darkgreen") +
+  geom_point(size = 2, color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_x_continuous(breaks = 2011:2023) +
+  labs(
+    title = "Well-Being Gap Over Time",
+    subtitle = "Difference in well-being index: Non-Appalachian minus Appalachian",
+    x = "Year",
+    y = "Well-Being Gap"
+  ) +
+  theme_minimal(base_size = 13)
+
+print(p_wb_gap)
+
+ggsave(
+  "Output/figures/wellbeing_gap_over_time.png",
+  p_wb_gap,
+  width = 8,
+  height = 5,
+  dpi = 300,
+  bg = "white"
+)
+
+
+
+
+
+
+
+
+
+
