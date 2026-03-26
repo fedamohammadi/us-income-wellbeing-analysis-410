@@ -686,12 +686,124 @@ ggsave("Output/figures/poverty_wellbeing_facet.png",
 
 
 
+# ==================================================
+# RAW INCOME PER CAPITA OVER TIME
+# Appalachian vs Non-Appalachian
+# ==================================================
+
+income_trend_df <- df %>%
+  group_by(year, Appalachia_Label) %>%
+  summarize(
+    mean_income = mean(income_per_capita, na.rm = TRUE),
+    median_income = median(income_per_capita, na.rm = TRUE),
+    sd_income = sd(income_per_capita, na.rm = TRUE),
+    n = sum(!is.na(income_per_capita)),
+    se_income = sd_income / sqrt(n),
+    .groups = "drop"
+  )
+
+# Main graph using mean income
+p_income_trend <- ggplot(
+  income_trend_df,
+  aes(x = year, y = mean_income, color = Appalachia_Label, group = Appalachia_Label)
+) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("steelblue", "firebrick")) +
+  scale_x_continuous(breaks = 2011:2023) +
+  labs(
+    title = "Raw Income Per Capita Over Time by Region",
+    subtitle = "Average county-level income per capita, 2011 to 2023",
+    x = "Year",
+    y = "Average Income Per Capita",
+    color = "Region"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p_income_trend)
+
+ggsave(
+  "Output/figures/raw_income_trend_by_region.png",
+  p_income_trend,
+  width = 8,
+  height = 5,
+  dpi = 300,
+  bg = "white"
+)
 
 
 
 
 
+# Median raw income trend
+p_income_trend_median <- ggplot(
+  income_trend_df,
+  aes(x = year, y = median_income, color = Appalachia_Label, group = Appalachia_Label)
+) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("steelblue", "firebrick")) +
+  scale_x_continuous(breaks = 2011:2023) +
+  labs(
+    title = "Median Raw Income Per Capita Over Time by Region",
+    subtitle = "Median county-level income per capita, 2011 to 2023",
+    x = "Year",
+    y = "Median Income Per Capita",
+    color = "Region"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
 
+print(p_income_trend_median)
+
+ggsave(
+  "Output/figures/raw_income_median_trend_by_region.png",
+  p_income_trend_median,
+  width = 8,
+  height = 5,
+  dpi = 300,
+  bg = "white"
+)
+
+# Income gap: Non-Appalachian minus Appalachian
+income_gap_df <- income_trend_df %>%
+  select(year, Appalachia_Label, mean_income) %>%
+  pivot_wider(names_from = Appalachia_Label, values_from = mean_income) %>%
+  mutate(gap = `Non-Appalachian` - Appalachian)
+
+p_income_gap <- ggplot(income_gap_df, aes(x = year, y = gap)) +
+  geom_line(linewidth = 1.2, color = "darkgreen") +
+  geom_point(size = 2, color = "darkgreen") +
+  scale_x_continuous(breaks = 2011:2023) +
+  labs(
+    title = "Income Gap Over Time",
+    subtitle = "Difference in average income per capita: Non-Appalachian minus Appalachian",
+    x = "Year",
+    y = "Income Gap"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p_income_gap)
+
+ggsave(
+  "Output/figures/raw_income_gap_over_time.png",
+  p_income_gap,
+  width = 8,
+  height = 5,
+  dpi = 300,
+  bg = "white"
+)
 
 
 
