@@ -348,9 +348,7 @@ model1_robust <- feols(
 )
 
 
-
 model1_cluster <- model1
-
 
 
 
@@ -364,10 +362,85 @@ etable(
 
 
 
+# =========================================================
+# CORRELATION MATRIX
+# =========================================================
+
+library(ggcorrplot)
+
+# Select only numeric variables
+corr_vars <- analysis_df %>%
+  select(
+    log_income,
+    life_expectancy,
+    poor_mental_health_days,
+    poor_physical_health_days,
+    wellbeing_index,
+    unemployment_rate,
+    poverty_rate,
+    bachelors_share,
+    uninsured_rate,
+    population_density,
+    gini
+  )
+
+# Compute correlation matrix
+corr_matrix <- cor(corr_vars, use = "complete.obs")
 
 
+print(round(corr_matrix, 3))
+
+# Plot
+p_corr <- ggcorrplot(
+  corr_matrix,
+  type = "lower",
+  lab = TRUE,
+  lab_size = 3,
+  colors = c("blue", "white", "red"),
+  title = "Correlation Matrix",
+  ggtheme = theme_minimal()
+)
+
+print(p_corr)
+
+ggsave(
+  "Output/figures/correlation_matrix.png",
+  p_corr,
+  width = 7,
+  height = 6,
+  dpi = 300,
+  bg = "white"
+)
 
 
+# =========================================================
+# SUMMARY STATISTICS
+# =========================================================
+
+library(modelsummary)
+
+summary_vars <- analysis_df %>%
+  select(
+    log_income,
+    life_expectancy,
+    poor_mental_health_days,
+    poor_physical_health_days,
+    wellbeing_index,
+    unemployment_rate,
+    poverty_rate,
+    bachelors_share,
+    uninsured_rate,
+    population_density,
+    gini
+  )
+
+datasummary_skim(
+  summary_vars,
+  output = "summary_statistics.html"
+)
+
+# Also print in console
+datasummary_skim(summary_vars)
 
 
 

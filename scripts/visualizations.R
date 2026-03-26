@@ -114,9 +114,6 @@ print(p1_hist)
 
 
 
-# Show in RStudio
-print(p1_hist)
-
 
 # Raw income
 p_raw <- ggplot(df, aes(x = income_per_capita)) +
