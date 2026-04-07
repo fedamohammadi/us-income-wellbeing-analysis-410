@@ -650,11 +650,10 @@ print(p_trend_physical)
 
 
 ggsave("Output/figures/trend_mental_health.png", p_trend_mental,
-       width = 7, height = 5, dpi = 300, bg = "white")
+       width = 10, height = 5, dpi = 300, bg = "white")
 
 ggsave("Output/figures/trend_physical_health.png", p_trend_physical,
-       width = 7, height = 5, dpi = 300, bg = "white")
-
+       width = 10, height = 5, dpi = 300, bg = "white")
 
 
 
@@ -729,7 +728,7 @@ print(p_income_trend)
 ggsave(
   "Output/figures/raw_income_trend_by_region.png",
   p_income_trend,
-  width = 8,
+  width = 10,
   height = 5,
   dpi = 300,
   bg = "white"
@@ -849,7 +848,7 @@ print(p_wb_trend)
 ggsave(
   "Output/figures/wellbeing_trend_by_region.png",
   p_wb_trend,
-  width = 8,
+  width = 10,
   height = 5,
   dpi = 300,
   bg = "white"
